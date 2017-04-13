@@ -13,7 +13,63 @@ import (
 type Context struct {
 	Input  string
 	Output string
-	Color int
+	Color  int
+}
+
+var morseCode = map[string]string{
+	".-.-.- " : ".",
+	"--..-- " : ",",
+	"---... " : ":",
+	"..--.. " : "?",
+	".----. " : "'",
+	"-.-.-- " : "!",
+	"-.--. " : "(",
+	"-.--.- " : ")",
+	".-... " : "&",
+	"-.-.-. " : ";",
+	"-...- " : "=",
+	".-.-. " : "+",
+	"..--.- " : "_",
+	".-..-." : `"`,
+	".--.-. " : "@",
+	"...-..- " : "$",
+	".- " : "a",
+	"-... " : "b",
+	"-.-. " : "c",
+	"-.. " : "d",
+	". " : "e",
+	"..-. " : "f",
+	"--. " : "g",
+	".... " : "h",
+	".. " : "i",
+	".--- " : "j",
+	"-.- " : "k",
+	".-.. " : "l",
+	"-- " : "m",
+	"-. " : "n",
+	"--- " : "o",
+	".--. " : "p",
+	"--.- " : "q",
+	".-. " : "r",
+	"... " : "s",
+	"- " : "t",
+	"..- " : "u",
+	"...- " : "v",
+	".-- " : "w",
+	"-..- " : "x",
+	"-.-- " : "y",
+	"--.. " : "z",
+	"----- " : "0",
+	".---- " : "1",
+	"..--- " : "2",
+	"...-- " : "3",
+	"....- " : "4",
+	"..... " : "5",
+	"-.... " : "6",
+	"--... " : "7",
+	"---.. " : "8",
+	"----. " : "9",
+	" " : " ",
 }
 
 func main() {
@@ -31,97 +87,50 @@ func myHomeFunc(w http.ResponseWriter, req *http.Request) {
 	}
 }
 
-func randomColor () int {
+func randomColor() int {
 	//var color = '#' + (Math.random() * 0xFFFFFF << 0).toString(16);
 	s1 := rand.NewSource(time.Now().UnixNano())
 	r1 := rand.New(s1)
 	return r1.Intn(999999)
 }
 
-func morseTranslator (input string) (output string) {
-	morseCode := map[string]string{
-		".-.-.- " : ".",
-		"--..-- " : ",",
-		"---... " : ":",
-		"..--.. " : "?",
-		".----. " : "'",
-		"-.-.-- " : "!",
-		"-.--. " : "(",
-		"-.--.- " : ")",
-		".-... " : "&",
-		"-.-.-. " : ";",
-		"-...- " : "=",
-		".-.-. " : "+",
-		"..--.- " : "_",
-		".-..-." : `"`,
-		".--.-. " : "@",
-		"...-..- " : "$",
-		".- " : "a",
-		"-... " : "b",
-		"-.-. " : "c",
-		"-.. " : "d",
-		". " : "e",
-		"..-. " : "f",
-		"--. " : "g",
-		".... " : "h",
-		".. " : "i",
-		".--- " : "j",
-		"-.- " : "k",
-		".-.. " : "l",
-		"-- " : "m",
-		"-. " : "n",
-		"--- " : "o",
-		".--. " : "p",
-		"--.- " : "q",
-		".-. " : "r",
-		"... " : "s",
-		"- " : "t",
-		"..- " : "u",
-		"...- " : "v",
-		".-- " : "w",
-		"-..- " : "x",
-		"-.-- " : "y",
-		"--.. " : "z",
-		"----- " : "0",
-		".---- " : "1",
-		"..--- " : "2",
-		"...-- " : "3",
-		"....- " : "4",
-		"..... " : "5",
-		"-.... " : "6",
-		"--... " : "7",
-		"---.. " : "8",
-		"----. " : "9",
-		" " : " ",
-	}
+func morseTranslator(input string) (output string) {
 	switch firstChar := string(input[0]); firstChar {
 	case ".", "-":
-		var temp string
-		for i := 0; i < len(input); i++ {
-			temp += string(input[i])
-			if string(input[i]) == " " {
-				for key, value := range morseCode {
-					if temp == key {
-						output += value
-						temp = ""
-						continue
-					}
-				}
-			}
-
-		}
+		output = encode(input)
 	default:
-		for i := 0; i < len(input); i++ {
+		output = decode(input)
+	}
+	return output
+}
+func encode(input string) (output string) {
+	var temp string
+	for i := 0; i < len(input); i++ {
+		temp += string(input[i])
+		if string(input[i]) == " " {
 			for key, value := range morseCode {
-				if string(input[i]) == value {
-					output += key
+				if temp == key {
+					output += value
+					temp = ""
 					continue
 				}
 			}
 		}
 
 	}
-	return output
+	return
+}
+
+func decode(input string) (output string) {
+	for i := 0; i < len(input); i++ {
+		for key, value := range morseCode {
+			if string(input[i]) == value {
+				output += key
+				continue
+			}
+		}
+	}
+	return
 }
 
 func translationFunc(w http.ResponseWriter, r *http.Request) {
